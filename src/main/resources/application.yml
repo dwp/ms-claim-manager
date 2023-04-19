@@ -1,0 +1,40 @@
+app_name: @project.artifactId@
+app_version: @project.version@
+
+spring:
+  main:
+    banner-mode: 'off'
+  jmx:
+    enabled: false
+  profiles:
+    active: dev
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/example
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, info, health
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+    prometheus:
+      enabled: true
+  health:
+    mongo:
+      enabled: false
+
+feature:
+  mongo:
+    stable:
+      api:
+        enabled: ${FEATURE_MONGO_STABLE_API_ENABLED:true}
+
+mongock:
+  change-logs-scan-package: uk.gov.dwp.health.claim.manager.migration

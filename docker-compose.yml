@@ -1,0 +1,85 @@
+version: "2.1"
+
+services:
+  localstack:
+    image: ${LOCALSTACK_IMAGE}
+    environment:
+      SERVICES: kms, sqs, sns
+      AWS_DEFAULT_REGION: eu-west-2
+      HOSTNAME_EXTERNAL: localstack
+    volumes:
+      - ./config/localstack:/docker-entrypoint-initaws.d
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:4566" ]
+    ports:
+      - "4566:4566"
+    logging:
+      driver: none
+
+  mongo:
+    image: mongo:5.0
+    command: --replSet rs0 --bind_ip_all
+    environment:
+      MONGO_INITDB_DATABASE: pip-apply-claim-mgr
+    volumes:
+      - ./config/mongo/init-replicaset.js:/docker-entrypoint-initdb.d/init-replicaset.js
+      - ./config/mongo/seed.js:/docker-entrypoint-initdb.d/seed.js
+    logging:
+      driver: none
+
+  ms-claim-manager:
+    image: '${GITLAB_IMAGE}'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - AWS_ENCRYPTION_KMS_OVERRIDE=http://localstack:4566
+      - AWS_ENCRYPTION_MESSAGE_DATA_KEY_ID=alias/noid
+      - AWS_ENCRYPTION_KMS_KEY_CACHE=true
+      - AWS_ACCESS_KEY_ID=my-key
+      - AWS_SECRET_ACCESS_KEY=its-a-secret
+      - APP_CLAIM_ACTIVE_DURATION=90
+      - FEATURE_CORRELATION_ENABLED=true
+      - FEATURE_DATA_CHANGESTREAM_ENABLED=true
+      - FEATURE_ENCRYPTION_MESSAGING_ENABLED=true
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/pip-apply-claim-mgr
+      - SPRING_PROFILES_ACTIVE=dev
+      - SUBMISSION_BASE_URL=http://ms-submission-manager:8080
+      - SUBMISSION_CREATE_PATH=/v1/create
+      - UK_GOV_DWP_HEALTH_CHANGESTREAM_CHANNELS[0]_COLLECTION=claim
+      - UK_GOV_DWP_HEALTH_CHANGESTREAM_CHANNELS[0]_DATABASE=pip-apply-claim-mgr
+      - UK_GOV_DWP_HEALTH_CHANGESTREAM_CHANNELS[0]_ROUTING_KEY=pip.claim.mgr.stream
+      - UK_GOV_DWP_HEALTH_CHANGESTREAM_CHANNELS[0]_SKIP_DECRYPTION=true
+      - UK_GOV_DWP_HEALTH_INTEGRATION_AWS_REGION=eu-west-2
+      - UK_GOV_DWP_HEALTH_INTEGRATION_MESSAGING_TYPE=aws
+      - UK_GOV_DWP_HEALTH_INTEGRATION_OUTBOUND_TOPIC_EXCHANGE=stream-topic
+      - UK_GOV_DWP_HEALTH_INTEGRATION_SNS_ENDPOINT_OVERRIDE=http://localstack:4566
+      - UK_GOV_DWP_HEALTH_INTEGRATION_SQS_ENDPOINT_OVERRIDE=http://localstack:4566
+    expose:
+      - 8080
+    ports:
+      - 9931:8080
+    depends_on:
+      mongo:
+        condition: service_started
+      localstack:
+        condition: service_healthy
+
+  api-test:
+    container_name: api-test
+    image: '${MAVEN_IMAGE}'
+    entrypoint: /bin/bash -c
+    command:
+      - |
+        until [ `curl -s -o /dev/null -w "%{http_code}" http://ms-claim-manager:8080/actuator/health` = "200" ]; do echo "service not available, sleeping 10."; sleep 10; done
+        sleep 30
+        mvn ${MVN_OPTS} verify -Papi-component-tests
+    working_dir: /usr/src
+    environment:
+      HOST: http://ms-claim-manager
+      PORT: 8080
+    volumes:
+      - .:/usr/src
+      - ${MVN_M2}:/root/.m2
+      - ${MVN_SETTINGS_FILE}:/root/.m2/settings.xml
+      - ./target/test-reports:/usr/src/target/test-reports

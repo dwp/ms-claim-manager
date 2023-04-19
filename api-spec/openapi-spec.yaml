@@ -1,0 +1,264 @@
+openapi: 3.0.1
+
+info:
+  title: DWP HTDS Claim Manager Service
+  description: Rest API for managing the claim record
+  version: '@project.version@'
+
+servers:
+  - url: 'https://localhost:8080'
+
+paths:
+  /v1/claim:
+    post:
+      tags:
+        - claim
+      summary: POST call to create a claim record, or return existing one if already created
+      description: |
+        * Mandatory fields for Update claim - Claimant Id, Benefit type.
+        e.g.
+          ```
+          {
+            "claimant_id": "5efbb7aebb703c618c3d4fe5",
+            "benefit_type": "PIP"
+          }
+          ```
+      operationId: returnOrCreateClaim
+      requestBody:
+        $ref: '#/components/requestBodies/ClaimCreateRequest'
+      responses:
+        200:
+          description: FOUND - an existing claim returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimRecordReturn'
+        201:
+          description: CREATED - no claim with given claimant id found, new claim created and returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimRecordReturn'
+        400:
+          description: BAD REQUEST - badly formed json or invalid PIP form data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseObject'
+        500:
+          description: INTERNAL SERVER ERROR - an internal error occurred
+
+  /v1/claim/update:
+    patch:
+      tags:
+        - claim
+      summary: PATCH call to update a claim record
+      description: |
+        * Mandatory fields for Update claim - CLaim Id, Form data.
+        e.g.
+          ```
+          {
+            "claim_id": "5efbb7aebb703c618c3d4fe5",
+            "form_data": "{\"data\", \"claim data\"}",
+          }
+          ```
+      operationId: updateClaim
+      requestBody:
+        $ref: '#/components/requestBodies/ClaimUpdateRequest'
+      responses:
+        200:
+          description: UPDATED - an existing claim updated and returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimRecordReturn'
+        400:
+          description: BAD REQUEST - badly formed json or invalid PIP form data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseObject'
+        401:
+          description: UNAUTHORIZED - claim does not exist with these values
+        500:
+          description: INTERNAL SERVER ERROR - an internal error occurred
+
+  /v1/claim/complete:
+    post:
+      tags:
+        - claim
+      summary: POST call to complete an active claim
+      description: |
+        Endpoint to complete the application form claim process and claim status updated.<br><br>
+      operationId: claimComplete
+      requestBody:
+        $ref: '#/components/requestBodies/ClaimCompleteRequest'
+      responses:
+        200:
+          description: claim record completed
+        400:
+          description: BAD REQUEST - badly formed json or invalid PIP form data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseObject'
+        401:
+          description: UNAUTHORIZED - claim does not exist with these values
+        500:
+          description: INTERNAL SERVER ERROR - an internal error occurred
+
+  /v1/claim/status/{claimId}:
+    get:
+      tags:
+        - query
+      summary: GET claim status.
+      description: |
+        endpoint to query status of a claim. <br><br>
+      operationId: queryClaim
+      parameters:
+        - in: path
+          name: claimId
+          description: unique claim id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: fetch an existing claim
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimStatus'
+
+        400:
+          description: BAD REQUEST - badly formed json or invalid PIP form data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseObject'
+        500:
+          description: INTERNAL SERVER ERROR - an internal error occurred
+
+components:
+  requestBodies:
+    ClaimCreateRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ClaimCreateObject'
+    ClaimUpdateRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ClaimUpdateObject'
+
+    ClaimCompleteRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ClaimCompleteObject'
+
+  schemas:
+    ClaimCreateObject:
+      type: object
+      required:
+        - claimant_id
+        - benefit_type
+      allOf:
+        - $ref: '#/components/schemas/ClaimantId'
+        - $ref: '#/components/schemas/BenefitType'
+    ClaimUpdateObject:
+      type: object
+      required:
+        - claimant_id
+        - benefit_type
+      allOf:
+        - $ref: '#/components/schemas/ClaimId'
+        - $ref: '#/components/schemas/FormData'
+    ClaimCompleteObject:
+      type: object
+      required:
+        - claim_id
+        - submission_id
+      allOf:
+        - $ref: '#/components/schemas/ClaimId'
+        - $ref: '#/components/schemas/SubmissionId'
+      properties:
+        drs_request_id:
+          type: string
+          description: drs request id
+          example: "5ed0d430716609122be7a4d6"
+          pattern: ^(?!\s*$).+
+    ClaimRecordReturn:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ClaimId'
+        - $ref: '#/components/schemas/SubmissionId'
+        - $ref: '#/components/schemas/FormData'
+        - $ref: '#/components/schemas/ClaimStatus'
+    ErrorResponseObject:
+      type: object
+      required:
+        - message
+      allOf:
+        - $ref: '#/components/schemas/Details'
+    BenefitType:
+      type: object
+      properties:
+        benefit_type:
+          description: the type of benefit PIP, ESA etc..
+          example: PIP
+          type: string
+          enum:
+            - PIP
+    ClaimantId:
+      type: object
+      description: claimant id (account reference)
+      properties:
+        claimant_id:
+          example: "6ed1d430716609122be7a4d6"
+          type: string
+          pattern: ^(?!\s*$).+
+    ClaimId:
+      type: object
+      description: claim id
+      properties:
+        claim_id:
+          example: "5ed0d430716609122be7a4d6"
+          type: string
+          pattern: ^(?!\s*$).+
+    SubmissionId:
+      type: object
+      description: submission id
+      properties:
+        submission_id:
+          example: "5ed0d430716609122be7a4d6"
+          type: string
+          pattern: ^(?!\s*$).+
+    ClaimStatus:
+      type: object
+      properties:
+        claim_status:
+          description: the status of the claim record
+          example: CLAIM_STARTED
+          type: string
+          enum:
+            - CLAIM_STARTED
+            - APPLICATION_SUBMITTED
+    FormData:
+      type: object
+      properties:
+        form_data:
+          description: the session data blob
+          type: string
+          example: "{\"data\", \"claim data\"}"
+          pattern: ^(?!\s*$).+
+    Details:
+      type: object
+      properties:
+        message:
+          description: detail description of fail/success
+          type: string
