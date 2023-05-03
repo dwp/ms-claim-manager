@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.7.10</version>
+    <version>2.7.11</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
@@ -15,6 +15,12 @@
   <name>ms-pip-claim-manager</name>
   <description>Pip micro service support save and resume a claim and save session data</description>
 
+  <!--
+[ERROR] LatencyUtils-2.0.3.jar: CVE-2021-4277(5.3)
+[ERROR] changock-utils-1.1.11.jar: CVE-2021-4277(5.3)
+[ERROR] plexus-utils-3.2.0.jar: CVE-2021-4277(5.3)
+[ERROR] snakeyaml-1.30.jar: CVE-2021-4235(5.5), CVE-2022-3064(7.5)
+  -->
   <properties>
     <java.version>11</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -30,6 +36,7 @@
     <swagger-annotations.version>1.6.5</swagger-annotations.version>
     <openapi-codegen-maven-plugin.version>4.3.1</openapi-codegen-maven-plugin.version>
     <jackson-nullable.version>0.2.2</jackson-nullable.version>
+    <snakeyaml.version>1.33</snakeyaml.version>
     <lidalia.version>1.2.0</lidalia.version>
     <maven.compiler.version>3.8.1</maven.compiler.version>
     <jacoco.version>0.8.5</jacoco.version>
@@ -50,6 +57,11 @@
     <extentreport-allure-annotation.version>1.0.2</extentreport-allure-annotation.version>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>${snakeyaml.version}</version>
+    </dependency>
     <dependency>
       <groupId>uk.gov.dwp.logging</groupId>
       <artifactId>encoded-logger-output</artifactId>
