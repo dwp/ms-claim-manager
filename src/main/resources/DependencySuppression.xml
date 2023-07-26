@@ -2,56 +2,16 @@
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
     <suppress>
         <notes><![CDATA[
-   file name: LatencyUtils-2.0.3.jar
-   file name: changock-utils-1.1.11.jar
-   ]]></notes>
-        <cve>CVE-2021-4277</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: snakeyaml-1.33.jar
-   ]]></notes>
-        <cve>CVE-2022-3064</cve>
-        <cve>CVE-2021-4235</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: guava-31.1-jre.jar
-   ]]></notes>
-        <cve>CVE-2020-8908</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: jackson-core-2.13.5.jar
-   ]]></notes>
-        <cve>CVE-2022-45688</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
       file name: bc-fips-1.0.2.3.jar
       ]]></notes>
         <cve>CVE-2022-45146</cve>
     </suppress>
     <suppress>
-        <notes><![CDATA[
-    <groupId>org.yaml</groupId>
-    <artifactId>snakeyaml</artifactId>
-    <version>1.30</version>
-      ]]></notes>
-        <cve>CVE-2022-25857</cve>
-        <cve>CVE-2022-38749</cve>
-        <cve>CVE-2022-38750</cve>
-        <cve>CVE-2022-38751</cve>
-        <cve>CVE-2022-38752</cve>
-        <cve>CVE-2022-41854</cve>
-        <cve>CVE-2022-1471</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[jmespath-java-1.11.951.jar]]></notes>
+        <notes><![CDATA[jmespath-java-1.12.132.jar]]></notes>
         <cve>CVE-2022-31159</cve>
     </suppress>
     <suppress>
-        <notes><![CDATA[aws-java-sdk-core-1.11.951.jar]]></notes>
+        <notes><![CDATA[aws-java-sdk-core-1.12.132.jar]]></notes>
         <cve>CVE-2022-31159</cve>
     </suppress>
     <suppress>
@@ -65,5 +25,11 @@
     <suppress>
         <notes><![CDATA[changock-runner-core-1.1.11.jar]]></notes>
         <cve>CVE-2022-39321</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jackson-databind-2.13.5.jar
+   ]]></notes>
+        <cve>CVE-2023-35116</cve>
     </suppress>
 </suppressions>

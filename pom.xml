@@ -5,13 +5,13 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.7.11</version>
+    <version>2.7.13</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
   <groupId>uk.gov.dwp.health.pip</groupId>
   <artifactId>ms-claim-manager</artifactId>
-  <version>1.6.0</version>
+  <version>1.6.1</version>
   <name>ms-pip-claim-manager</name>
   <description>Pip micro service support save and resume a claim and save session data</description>
 
@@ -27,20 +27,20 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <client.base.package.name>uk.gov.dwp.health.claim.manager</client.base.package.name>
     <spring-framework.version>5.3.27</spring-framework.version>
-    <dwp.encoded.log.version>2.2.3-112b45f6</dwp.encoded.log.version>
+    <dwp.encoded.log.version>2.3.0-c5d6b343</dwp.encoded.log.version>
     <dwp.correlationId.version>1.0.0-bd6576e3</dwp.correlationId.version>
-    <dwp.message-broker.version>2.10.0-827dccdb</dwp.message-broker.version>
+    <dwp.message-broker.version>2.12.0-cce5f733</dwp.message-broker.version>
     <dwp-mongo-change-stream-starter.version>3.2.0-dd59aa6b</dwp-mongo-change-stream-starter.version>
     <mongock.version>4.1.19</mongock.version>
-    <guava.version>31.1-jre</guava.version>
+    <guava.version>32.0.1-jre</guava.version>
     <swagger-annotations.version>1.6.5</swagger-annotations.version>
     <openapi-codegen-maven-plugin.version>4.3.1</openapi-codegen-maven-plugin.version>
     <jackson-nullable.version>0.2.2</jackson-nullable.version>
-    <snakeyaml.version>1.33</snakeyaml.version>
+    <snakeyaml.version>2.0</snakeyaml.version>
     <lidalia.version>1.2.0</lidalia.version>
     <maven.compiler.version>3.8.1</maven.compiler.version>
     <jacoco.version>0.8.5</jacoco.version>
-    <owasp.version>8.0.1</owasp.version>
+    <owasp.version>8.3.1</owasp.version>
     <plugin.spotbugs.version>4.2.2</plugin.spotbugs.version>
     <plugin.projectinfo.version>3.1.1</plugin.projectinfo.version>
     <plugin.surefire.version>2.22.0</plugin.surefire.version>
@@ -58,19 +58,14 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.yaml</groupId>
-      <artifactId>snakeyaml</artifactId>
-      <version>${snakeyaml.version}</version>
-    </dependency>
-    <dependency>
       <groupId>uk.gov.dwp.logging</groupId>
       <artifactId>encoded-logger-output</artifactId>
       <version>${dwp.encoded.log.version}</version>
     </dependency>
     <dependency>
-      <groupId>uk.gov.dwp.health.pip</groupId>
-      <artifactId>correlationId-springboot-starter</artifactId>
-      <version>${dwp.correlationId.version}</version>
+      <groupId>uk.gov.dwp.health.logging</groupId>
+      <artifactId>dwp-meta-data-logger</artifactId>
+      <version>2.0.0-56b86a2e</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>

@@ -9,6 +9,7 @@ variables:
   REPO_OWNER: "Team Goldcrest"
   REPO_PATTERN: "V3 CI"
   GITHUB_REPO_NAME: ms-claim-manager
+  CI_PROJECT_NAME: ms-claim-manager
 
 stages:
   - update-version
@@ -22,8 +23,12 @@ stages:
   - image-push
   - update-project-metadata
   - create-schedules
-  - repo-gen
   - open-source
+  - update-changelog
+  - release-mr-main
+  - release-tag
+  - release-update-version
+  - release-mr-develop
 
 include:
   - local: "/gitlab-ci/includes.yml"
@@ -83,4 +88,4 @@ create-develop-nightly-schedule:
 trivy-container:
   extends: .trivy-container-base
   variables:
-    HIGH_SUPPRESSIONS: ""
+    HIGH_SUPPRESSIONS: "CVE-2023-0464,CVE-2023-2650"
