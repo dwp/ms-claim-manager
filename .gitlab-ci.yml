@@ -37,6 +37,11 @@ required-fragment-check:
   variables:
     RULESET: MAVEN_CI
 
+docker-build:
+  extends: .docker-build-template
+  before_script:
+    - echo $DT_API_TOKEN | docker login -u pik94420 --password-stdin https://pik94420.live.dynatrace.com
+
 maven-pitest:
   script:
     - mvn test org.pitest:pitest-maven:mutationCoverage -DhistoryInputFile="pitest/pitHistory.txt" -DhistoryOutputFile="pitest/pitHistory.txt" -s ${MVN_SETTINGS_FILE} -Dmaven.repo.local=./.m2-local ${MVN_OPTS} ${MVN_CLI_OPTS}
@@ -48,6 +53,8 @@ maven-pitest:
     - eval $(aws ecr get-login --no-include-email --region eu-west-2 | sed 's|https://||')
     - echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
     - export GITLAB_IMAGE="$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:${CI_COMMIT_SHA:0:8}"
+    - echo $DT_API_TOKEN | docker login -u pik94420 --password-stdin https://pik94420.live.dynatrace.com
+    - echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
 
 api-test:
   allow_failure: false
